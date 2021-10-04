@@ -1,0 +1,500 @@
+package rules
+
+import com.javainuse.model.Bicikla
+
+rule "Mekana guma"
+when
+	o:Bicikla(guma_stanje == "mekana")
+then
+	o.setGuma_stanje("napumpana");
+	o.setGuma_akcija2("Napumpaj gumu.");
+end
+
+rule "Mekana guma, ventil los"
+when
+	o:Bicikla(guma_stanje == "mekana", ventil_stanje == "los")
+then
+	o.setVentil_stanje("dobar");
+	o.setGuma_akcija1("Zameni ventil.");
+end
+
+rule "Kriv bandas"
+when
+	o:Bicikla(bandas_stanje == "kriv")
+then
+	o.setBandas_stanje("centriran");
+	o.setBandas_akcija2("Centriraj bandas.");
+end
+
+rule "Kriv bandas, zica pokidana"
+when
+	o:Bicikla(bandas_stanje == "kriv", zica_stanje == "pokidana")
+then
+	o.setZica_stanje("cela");
+	o.setBandas_akcija1("Zameni pokidanu/pokidane zicu/zice.");
+end
+
+rule "Neispravan amortizer"
+when
+	o:Bicikla(amortizer_stanje == "neispravan")
+then
+	o.setAmortizer_stanje("ispravan");
+end
+
+rule "Neispravan vazdusni amortizer, previse vazduha u suspenziji"
+when
+	o:Bicikla(amortizer_stanje == "neispravan", amortizer_tip == "vazdusan", suspenzija_stanje == "prepumpana")
+then
+	o.setSuspenzija_stanje("umereno napumpana");
+	o.setAmortizer_akcija1("Smanji vazduh u suspenziji vazdusnog amortizera.");
+end
+
+rule "Neispravan vazdusni amortizer, premalo vazduha u suspenziji"
+when
+	o:Bicikla(amortizer_stanje == "neispravan", amortizer_tip == "vazdusan", suspenzija_stanje == "premekana")
+then
+	o.setSuspenzija_stanje("umereno napumpana");
+	o.setAmortizer_akcija2("Povecaj vazduh u suspenziji vazdusnog amortizera.");
+end
+/*
+rule "Neispravan vazdusni amortizer"
+when
+	o:Bicikla(amortizer_stanje == "neispravan", amortizer_tip == "vazdusan")
+then
+	o.setAmortizer_stanje("ispravan");
+	o.setAmortizer_akcija("Zameni vazdusan amortizer i napumpaj ga.");
+end
+
+rule "Neispravan amortizer sa oprugama, podmazivanje"
+when
+	o:Bicikla(amortizer_stanje == "neispravan", amortizer_tip == "oprugast")
+then
+	o.setAmortizer_stanje("ispravan");
+	o.setAmortizer_akcija("Podmazi amortizer sa oprugama.");
+end
+*/
+rule "Neispravan amortizer sa oprugama, uzrok jake opruge"
+when
+	o:Bicikla(amortizer_stanje == "neispravan", amortizer_tip == "oprugast", opruge_stanje == "jake")
+then
+	o.setOpruge_stanje("mekane");
+	o.setAmortizer_akcija3("Zameni opruge u amortizeru blazim i podmazi ga.");
+end
+
+rule "Neispravan amortizer sa oprugama, uzrok mekane opruge"
+when
+	o:Bicikla(amortizer_stanje == "neispravan", amortizer_tip == "oprugast", opruge_stanje == "mekane")
+then
+	o.setOpruge_stanje("jake");
+	o.setAmortizer_akcija4("Zameni opruge u amortizeru jacim i podmazi ga.");
+end
+
+rule "Lanac preskace"
+when
+	o:Bicikla(lanac_stanje == "los")
+then
+	o.setLanac_stanje("dobar");
+end
+
+rule "Lanac preskace, istegnut je"
+when
+	o:Bicikla(lanac_stanje == "los", duzina_lanca_stanje == "istegnut")
+then
+	o.setDuzina_lanca_stanje("neistegnut");
+	o.setLanac_akcija1("Zameni lanac.");
+end
+
+rule "Lanac preskace, uzrok prednji zupcanici koji su potroseni"
+when
+	o:Bicikla(lanac_stanje == "los", prednji_zupcanici_stanje == "potroseni")
+then
+	o.setPrednji_zupcanici_stanje("nepotroseni");
+	o.setLanac_akcija2("Zameni prednje zupcanike.");
+end
+
+rule "Lanac preskace, uzrok zadnji zupcanici koji su potroseni"
+when
+	o:Bicikla(lanac_stanje == "los", zadnji_zupcanici_stanje == "potroseni")
+then
+	o.setZadnji_zupcanici_stanje("nepotroseni");
+	o.setLanac_akcija3("Zameni zadnje zupcanike.");
+end
+
+rule "Lanac preskace, uzrok freewheel ili freehub"
+when
+	o:Bicikla(lanac_stanje == "los", (freewheel_stanje == "los" || freehub_stanje == "los"))
+then
+	o.setFreewheel_stanje("dobar");
+	o.setFreehub_stanje("dobar");
+	o.setLanac_akcija4("Zameni freewheel ili freehub u zavisnosti sta imas.");
+end
+
+rule "Luft u srednjem pogonu, uzrok odvijene solje"
+when
+	o:Bicikla(srednji_pogon_stanje == "luft", solje_sr_pog_stanje == "odvijene")
+then
+	o.setSolje_sr_pog_stanje("zavijene");
+	o.setSrednji_pogon_akcija2("Zategni solje srednjeg pogona.");
+end
+
+rule "Luft u srednjem pogonu, uzrok lezajevi"
+when
+	o:Bicikla(srednji_pogon_stanje == "luft", lezajevi_sr_pog_stanje == "losi")
+then
+	o.setLezajevi_sr_pog_stanje("dobri");
+	o.setSrednji_pogon_akcija1("Zameni lezajeve srednjeg pogona.");
+end
+
+rule "Luft u srednjem pogonu"
+when
+	o:Bicikla(srednji_pogon_stanje == "luft")
+then
+	o.setSrednji_pogon_stanje("nema luft");
+end
+
+rule "Labava kurbla, uzrok olabavljen sraf koji ide u osovinu"
+when
+	o:Bicikla(kurbla_stanje == "labava", sraf_osovine_stanje == "odvijen")
+then
+	o.setSraf_osovine_stanje("zavijen");
+	o.setKurbla_akcija1("Zategni sraf koji ide u osovinu i koji drzi kurblu.");
+end
+
+rule "Labava kurbla, uzrok navoj osovine"
+when
+	o:Bicikla(kurbla_stanje == "labava", navoj_osovine_stanje == "los")
+then
+	o.setNavoj_osovine_stanje("dobar");
+	o.setKurbla_akcija2("Promeni osovinu srednjeg pogona.");
+end
+
+rule "Labava kurbla"
+when
+	o:Bicikla(kurbla_stanje == "labava")
+then
+	o.setKurbla_stanje("zategnuta");
+end
+
+rule "Neispravna pedala"
+when
+	o:Bicikla(pedala_stanje == "luft" || pedala_stanje == "krcka")
+then
+	o.setPedala_stanje("nema luft");
+	o.setPedala_akcija("Zameni lezajeve u pedali.");
+end
+
+rule "Kocnica ne koci po povrsini obruca, uzrok potroseni paknovi"
+when
+	o:Bicikla(kocnica_stanje == "ne koci", kociona_povrs_tip == "obruc", paknovi_stanje == "potroseni")
+then
+	o.setPaknovi_stanje("dobri");
+	o.setKocnica_akcija1("Promeni paknove kocnice.");
+end
+
+rule "Kocnica ne koci po povrisini obruca"
+when
+	o:Bicikla(kocnica_stanje == "ne koci", kociona_povrs_tip == "obruc")
+then
+	o.setKocnica_akcija2("Promeni sajle i buzire kocnice.");
+end
+
+rule "Kocnica ne koci"
+when
+	o:Bicikla(kocnica_stanje == "ne koci")
+then
+	o.setKocnica_stanje("koci");
+	o.setKocnica_akcija7("Nasteluj kocnicu.");
+end
+
+rule "Kocnica ne koci po povrsini diska, uzrok potrosene plocice"
+when
+	o:Bicikla(kocnica_stanje == "ne koci", kociona_povrs_tip == "disk", plocice_stanje == "potrosene")
+then
+	o.setPlocice_stanje("dobre");
+	o.setKocnica_akcija3("Promeni plocice diska.");
+end
+
+rule "Kocnica ne koci po povrsini diska, uzrok potrosen disk"
+when
+	o:Bicikla(kocnica_stanje == "ne koci", kociona_povrs_tip == "disk", disk_stanje == "los")
+then
+	o.setDisk_stanje("dobar");
+	o.setKocnica_akcija4("Promeni disk.");
+end
+
+rule "Kocnica ne koci po povrsini diska, mehanicki disk"
+when
+	o:Bicikla(kocnica_stanje == "ne koci", kociona_povrs_tip == "disk", disk_tip == "mehanicki")
+then
+	o.setKocnica_akcija5("Promeni sajlu i buzire.");
+end
+
+rule "Kocnica ne koci po povrsini diska, hidraulicni disk"
+when
+	o:Bicikla(kocnica_stanje == "ne koci", kociona_povrs_tip == "disk", disk_tip == "hidraulicni")
+then
+	o.setKocnica_akcija6("Promeni creva, klipove i sipaj ulje.");
+end
+
+rule "Prednji menjac ne prebacuje"
+when
+	o:Bicikla(prednji_menjac_stanje == "ne prebacuje")
+then
+	o.setPrednji_menjac_stanje("prebacuje");
+	o.setPrednji_menjac_akcija5("Podesi prednji menjac.");
+end
+
+rule "Prednji menjac ne prebacuje, uzrok previse je podignut"
+when
+	o:Bicikla(prednji_menjac_stanje == "ne prebacuje", visina_prednjeg_menjaca_stanje == "previse podignut")
+then
+	o.setVisina_prednjeg_menjaca_stanje("taman"); 
+	o.setPrednji_menjac_akcija1("Smanji visinu prednjeg menjaca.");
+end
+
+rule "Prednji menjac ne prebacuje, uzrok previse je spusten"
+when
+	o:Bicikla(prednji_menjac_stanje == "ne prebacuje", visina_prednjeg_menjaca_stanje == "previse spusten")
+then
+	o.setVisina_prednjeg_menjaca_stanje("taman"); 
+	o.setPrednji_menjac_akcija1("Povecaj visinu prednjeg menjaca.");
+end
+
+rule "Prednji menjac ne prebacuje, uzrok nije u paraleli sa prednjim lancanicima"
+when
+	o:Bicikla(prednji_menjac_stanje == "ne prebacuje", paralela_sa_lancanicima_stanje == "nije")
+then
+	o.setParalela_sa_lancanicima_stanje("jeste");
+	o.setPrednji_menjac_akcija2("Stavi ga u paraleli sa lancanicima.");
+end
+
+rule "Prednji menjac ne prebacuje, uzrok losa sajla"
+when
+	o:Bicikla(prednji_menjac_stanje == "ne prebacuje", sajla_prednjeg_menjaca_stanje == "losa")
+then
+	o.setSajla_prednjeg_menjaca_stanje("dobra");
+	o.setPrednji_menjac_akcija3("Promeni sajlu i buzire prednjeg menjaca.");
+end
+
+rule "Prednji menjac ne prebacuje, uzrok propao index rucice prednjeg menjaca"
+when
+	o:Bicikla(prednji_menjac_stanje == "ne prebacuje", index_rucice_prednjeg_menjaca_stanje == "propao")
+then
+	o.setIndex_rucice_prednjeg_menjaca_stanje("dobar");
+	o.setPrednji_menjac_akcija4("Promeni index rucice prednjeg menjaca.");
+end
+
+rule "Zadnji menjac ne prebacuje"
+when
+	o:Bicikla(zadnji_menjac_stanje == "ne prebacuje")
+then
+	o.setZadnji_menjac_stanje("prebacuje");
+	o.setZadnji_menjac_akcija5("Podesi zadnji menjac.");
+end
+
+rule "Zadnji menjac ne prebacuje, uzrok kriva kuka zadnjeg menjaca"
+when
+	o:Bicikla(zadnji_menjac_stanje == "ne prebacuje", kuka_zadnjeg_menjaca_stanje == "kriva")
+then
+	o.setKuka_zadnjeg_menjaca_stanje("prava");
+	o.setZadnji_menjac_akcija1("Zameni kuku zadnjeg menjaca.");
+end
+
+rule "Zadnji menjac ne prebacuje, uzrok propao index rucice zadnjeg menjaca"
+when
+	o:Bicikla(zadnji_menjac_stanje == "ne prebacuje", index_rucice_zadnjeg_menjaca_stanje == "propao")
+then
+	o.setIndex_rucice_zadnjeg_menjaca_stanje("dobar");
+	o.setZadnji_menjac_akcija2("Zameni index rucice zadnjeg menjaca.");
+end
+
+rule "Zadnji menjac ne prebacuje, uzrok potrosene rolnice"
+when
+	o:Bicikla(zadnji_menjac_stanje == "ne prebacuje", rolnice_zadnjeg_menjaca_stanje == "potrosene")
+then
+	o.setRolnice_zadnjeg_menjaca_stanje("dobre");
+	o.setZadnji_menjac_akcija3("Zameni rolnice zadnjeg menjaca.");
+end
+
+rule "Zadnji menjac ne prebacuje, uzrok losa sajla"
+when
+	o:Bicikla(zadnji_menjac_stanje == "ne prebacuje", sajla_zadnjeg_menjaca_stanje == "losa")
+then
+	o.setSajla_zadnjeg_menjaca_stanje("dobra");
+	o.setZadnji_menjac_akcija4("Zameni sajlu zadnjeg menjaca.");
+end
+
+rule "Kaseta vrti u prazno"
+when
+	o:Bicikla(kaseta_stanje == "vrti u prazno")
+then
+	o.setKaseta_stanje("radi");
+	o.setKaseta_akcija("Skini kasetu i ocisti je.");
+end
+
+rule "Sticna propada u ram"
+when
+	o:Bicikla(sticna_stanje == "propada")
+then
+	o.setSticna_stanje("ne propada");
+	o.setSticna_akcija("Zategni selnu.");
+end
+
+rule "Problem udobnosti sedista, tvrdo sediste"
+when
+	o:Bicikla(sediste_stanje == "tvrdo")
+then
+	o.setSediste_stanje("meko");
+	o.setSediste_akcija("Zameni sediste meksim");
+end
+
+rule "Olabavljena lula volana, uzrok sraf lule volana"
+when
+	o:Bicikla(lula_volana_stanje == "olabavljena")
+then
+	o.setLula_volana_stanje("zategnuta");
+	o.setLula_volana_akcija("Zategni sraf lule volana.");
+end
+
+rule "Olabavljen volan, uzrok srafovi na luli volana"
+when
+	o:Bicikla(volan_stanje == "olabavljen")
+then
+	o.setVolan_stanje("zategnut");
+	o.setVolan_akcija("Zategni srafove na luli volana.");
+end
+
+rule "Luft u tocku, uzrok lezajevi glave tocka"
+when
+	o:Bicikla(tocak_stanje == "luft")
+then
+	o.setTocak_stanje("nema luft");
+	o.setTocak_akcija("Promeni lezajeve u glavi tocku.");
+end
+
+rule "Luft u viljuski, uzrok lezajevi soljica rama"
+when
+	o:Bicikla(viljuska_stanje == "luft")
+then
+	o.setViljuska_stanje("nema luft");
+	o.setViljuska_akcija("Promeni lezajeve soljica rama.");
+end
+
+rule "Rdja na ramu"
+when
+	o:Bicikla(ram_rdja_stanje == "ima")
+then
+	o.setRam_rdja_stanje("nema");
+	o.setRam_rdja_akcija("Osmirglaj zeljenu povrsinu na ramu i premazi je farbom.");
+end
+
+rule "Lanac skripi"
+when
+	o:Bicikla(lanac_skripi_stanje == "da")
+then
+	o.setLanac_skripi_stanje("ne");
+	o.setLanac_skripi_akcija("Podmazi lanac uljem.");
+end
+
+rule "Problem u zglobu full suspension ram-a"
+when
+	o:Bicikla(full_suspension_ram_stanje == "jeste", zglobovi_stanje == "luft", zglobovi_stanje == "lose radi")
+then
+	o.setZglobovi_stanje("nema luft");
+	o.setFull_suspension_ram_akcija("Zameni lezajeve u zglobu full suspension ram-a.");
+end
+
+rule "Ulje na ramu"
+when
+	o:Bicikla(ram_ulje_stanje == "ima")
+then
+	o.setRam_ulje_stanje("nema");
+	o.setRam_ulje_akcija("Obrisi ulje sa rama.");
+end
+
+rule "Udaren ram, kriv"
+when
+	o:Bicikla(ram_udaren_stanje == "jeste", ram_kriv_stanje == "jeste")
+then
+	o.setRam_kriv_stanje("nije");
+	o.setRam_udaren_stanje("nije");
+	o.setRam_udaren_akcija("Zameni ram.");
+end
+
+rule "Udaren ram, pukao"
+when
+	o:Bicikla(ram_udaren_stanje == "jeste", ram_pukao_stanje == "jeste")
+then
+	o.setRam_pukao_stanje("nije");
+	o.setRam_udaren_stanje("nije");
+	o.setRam_udaren_akcija("Zavari i ofarbaj ram.");
+end
+
+rule "Neodgovarajuca duzina bicikla, uzrok kratka lula"
+when
+	o:Bicikla(duzina_bicikla_stanje == "ne odgovara")
+then
+	o.setDuzina_bicikla_stanje("odgovara");
+	o.setDuzina_bicikla_akcija("Zameni lulu duzom.");
+end
+
+rule "Krutost bicikle, uzrok ram nema amortizere"
+when
+	o:Bicikla(krut_bicikl_stanje == "jeste")
+then
+	o.setKrut_bicikl_stanje("nije");
+	o.setKrut_bicikl_akcija("Zameni ram za ram sa amortizerom.");
+end
+
+rule "Vibracije pri voznji, uzrok previse naduvane gume"
+when
+	o:Bicikla(vibracije_pri_voznji_stanje == "ima")
+then
+	o.setVibracije_pri_voznji_stanje("nema");
+	o.setVibracije_pri_voznji_akcija("Ispusti pritisak u gumama.");
+end
+
+rule "Neispravnost dropper post-a, uzrok popustila sajla"
+when
+	o:Bicikla(dropper_post_stanje == "neispravan", sajla_dropper_post_stanje == "popustila")
+then
+	o.setSajla_dropper_post_stanje("ispravan");
+	o.setDropper_post_stanje("nije popustila");
+	o.setDropper_post_akcija("Zategni sajlu.");
+end
+
+rule "Neispravnost dropper post-a"
+when
+	o:Bicikla(dropper_post_stanje == "neispravan")
+then
+	o.setSajla_dropper_post_stanje("ispravan");
+	o.setDropper_post_akcija("Zameni dropper post.");
+end
+
+rule "Neispravnost hidraulicnog zakljucavanja vile, uzrok popustila sajla"
+when
+	o:Bicikla(zakljucavanje_vile_stanje == "neispravno", sajla_zak_vile_stanje == "popustila")
+then
+	o.setSajla_zak_vile_stanje("nije popustila");
+	o.setZakljucavanje_vile_stanje("ispravno");
+	o.setZakljucavanje_vile_akcija("Zategni sajla.");
+end
+
+rule "Neispravnost hidraulicnog zakljucavanja vile, uzrok stubovi vile imaju ogrebotine"
+when
+	o:Bicikla(zakljucavanje_vile_stanje == "neispravno", stubovi_vile_stanje == "imaju ogrebotine")
+then
+	o.setStubovi_vile_stanje("nemaju ogrebotine");
+	o.setZakljucavanje_vile_stanje("ispravno");
+	o.setZakljucavanje_vile_akcija("Promeni stubove vile.");
+end
+
+rule "Neispravnost hidraulicnog zakljucavanja vile"
+when
+	o:Bicikla(zakljucavanje_vile_stanje == "neispravno")
+then
+	o.setZakljucavanje_vile_stanje("ispravno");
+	o.setZakljucavanje_vile_akcija("Promeni hidraulicno zakljucavanje vile.");
+end
+
+
